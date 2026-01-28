@@ -176,7 +176,7 @@ def score_response():
 @app.route('/health')
 def health():
     """Health check endpoint"""
-    api_key_configured = OPENAI_API_KEY and OPENAI_API_KEY != DEFAULT_OPENAI_KEY
+    api_key_configured = bool(OPENAI_API_KEY)
     return jsonify({
         'status': 'ok',
         'api_key_set': api_key_configured
