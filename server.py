@@ -28,11 +28,11 @@ logger = logging.getLogger('prs_server')
 # OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
 
 # OpenAI configuration (prototype setup)
-OPENAI_API_KEY = os.environ.get(
-    'OPENAI_API_KEY',
-    'REPLACE_WITH_ENV_OPENAI_KEY'  # fallback for prototype
-)
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
+
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY is not set in environment variables")
 
 # Simple in-memory cache for identical prompts to reduce latency on repeats
 # cache: { key: (timestamp_seconds, response_text) }
