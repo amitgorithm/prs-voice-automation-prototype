@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRS Automation System - Voice Enabled</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateX(8px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            color: #1a202c;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .options-list {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .option-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .alert {
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-danger {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            color: #742a2a;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            color: #22543d;
+        }
+
+        .alert-info {
+            background: #ebf8ff;
+            border: 2px solid #4299e1;
+            color: #2c5282;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .recording-indicator {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .scale-select {
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .final-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Scale Selection Screen -->
+        <div id="scaleSelection" class="card">
+            <h1>PRS Automation System</h1>
+            <p class="subtitle">
+                Clinician-grade automated administration of patient-reported symptom scales with AI-powered scoring, voice interaction, and complete audit trails.
+            </p>
+
+            <h2>Select Assessment Scale</h2>
+            
+            <div class="scale-select">
+                <div class="btn btn-primary btn-full" onclick="startScale('BDI-II')" style="margin-bottom: 1rem;">
+                    <span style="flex: 1;">
+                        <div style="font-size: 1.25rem; margin-bottom: 0.5rem;">Beck Depression Inventory II</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9;">5 questions • Version 1.0</div>
+                    </span>
+                    <span>→</span>
+                </div>
+
+                <div class="btn btn-primary btn-full" onclick="startScale('COMPASS-31')">
+                    <span style="flex: 1;">
+                        <div style="font-size: 1.25rem; margin-bottom: 0.5rem;">COMPASS-31 Autonomic Assessment</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9;">3 questions • Version 1.0</div>
+                    </span>
+                    <span>→</span>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <span>✓</span>
+                <div>
+                    <strong>Voice Recording Ready</strong><br>
+                    This standalone version has full microphone access for speech-to-text.
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Screen -->
+        <div id="assessmentScreen" class="hidden">
+            <!-- Progress Header -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 id="scaleName"></h2>
+                        <div id="progressText" style="color: #718096;"></div>
+                    </div>
+                    <div class="badge" id="progressBadge"></div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="card">
+                <div style="font-size: 0.875rem; font-weight: 600; color: #667eea; text-transform: uppercase; margin-bottom: 1rem;" id="domainText"></div>
+                <div class="question-text" id="questionText"></div>
+
+                <div id="backupAlert" class="alert alert-danger hidden">
+                    <span>⚠</span>
+                    <span>Clarification needed - please provide a clearer response</span>
+                </div>
+
+                <div class="options-list">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 1rem;">Response Options:</div>
+                    <div id="optionsList"></div>
+                </div>
+            </div>
+
+            <!-- Response Input Card -->
+            <div class="card">
+                <h3>Provide Your Response</h3>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="speakQuestion()" id="speakBtn">
+                        🔊 Hear Question
+                    </button>
+                    <button class="btn btn-success" onclick="toggleRecording()" id="recordBtn" style="flex: 1;">
+                        🎤 Start Voice Recording
+                    </button>
+                </div>
+
+                <div id="recordingIndicator" class="alert alert-danger recording-indicator hidden">
+                    <span>🎤</span>
+                    <div>
+                        <strong>Listening... Speak now</strong><br>
+                        <span id="interimText" style="font-style: italic;"></span>
+                    </div>
+                </div>
+
+                <div id="capturedResponse" class="alert alert-success hidden">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">✓ Captured Response:</div>
+                        <div id="capturedText" style="font-style: italic; font-size: 1.125rem;"></div>
+                    </div>
+                    <button onclick="clearResponse()" style="background: transparent; border: none; color: #e53e3e; font-weight: 600; cursor: pointer;">Clear</button>
+                </div>
+
+                <label>Or Type/Edit Response:</label>
+                <textarea id="responseInput" placeholder="You can also type or edit your response here..."></textarea>
+
+                <button class="btn btn-primary btn-full" onclick="submitResponse()" id="submitBtn" style="margin-top: 1.5rem;">
+                    <span>✓</span>
+                    <span>Submit Response</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden">
+            <div class="card" style="text-align: center;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                    <span style="font-size: 48px;">✓</span>
+                </div>
+                <h2>Assessment Complete</h2>
+                <p id="completedScaleName" style="font-size: 1.125rem; color: #4a5568;"></p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 0.875rem; font-weight: 600; color: #667eea; text-transform: uppercase; margin-bottom: 1rem;">Final Score</div>
+                <div class="final-score" id="finalScore"></div>
+                <div style="color: #718096;" id="scoreDescription"></div>
+            </div>
+
+            <div class="card">
+                <h3>Item-Level Results</h3>
+                <div id="itemResults"></div>
+            </div>
+
+            <div class="card">
+                <button class="btn btn-primary btn-full" onclick="location.reload()">
+                    Start New Assessment
+                </button>
+                <button class="btn btn-secondary btn-full" onclick="downloadJSON()" style="margin-top: 1rem;">
+                    📄 Download Session Data (JSON)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PRS Scales Data
+        const PRS_SCALES = {
+            "BDI-II": {
+                ScaleName: "Beck Depression Inventory II",
+                Version: "1.0",
+                CalculationType: "SUM",
+                Questions: [
+                    {
+                        QuestionID: "Q1",
+                        Domain: "Sadness",
+                        QuestionText: "Over the past two weeks, how would you describe your feelings of sadness?",
+                        Options: [
+                            { Label: "I do not feel sad", Score: 0 },
+                            { Label: "I feel sad much of the time", Score: 1 },
+                            { Label: "I am sad all the time", Score: 2 },
+                            { Label: "I am so sad or unhappy that I can't stand it", Score: 3 }
+                        ]
+                    },
+                    {
+                        QuestionID: "Q2",
+                        Domain: "Pessimism",
+                        QuestionText: "How do you feel about your future?",
+                        Options: [
+                            { Label: "I am not discouraged about my future", Score: 0 },
+                            { Label: "I feel more discouraged about my future than I used to be", Score: 1 },
+                            { Label: "I do not expect things to work out for me", Score: 2 },
+                            { Label: "I feel my future is hopeless and will only get worse", Score: 3 }
+                        ]
+                    },
+                    {
+                        QuestionID: "Q3",
+                        Domain: "Past Failure",
+                        QuestionText: "How do you feel about your past?",
+                        Options: [
+                            { Label: "I do not feel like a failure", Score: 0 },
+                            { Label: "I have failed more than I should have", Score: 1 },
+                            { Label: "As I look back, I see a lot of failures", Score: 2 },
+                            { Label: "I feel I am a total failure as a person", Score: 3 }
+                        ]
+                    },
+                    {
+                        QuestionID: "Q4",
+                        Domain: "Loss of Pleasure",
+                        QuestionText: "How much pleasure do you get from things you used to enjoy?",
+                        Options: [
+                            { Label: "I get as much pleasure as I ever did from the things I enjoy", Score: 0 },
+                            { Label: "I don't enjoy things as much as I used to", Score: 1 },
+                            { Label: "I get very little pleasure from the things I used to enjoy", Score: 2 },
+                            { Label: "I can't get any pleasure from the things I used to enjoy", Score: 3 }
+                        ]
+                    },
+                    {
+                        QuestionID: "Q5",
+                        Domain: "Guilty Feelings",
+                        QuestionText: "Do you experience feelings of guilt?",
+                        Options: [
+                            { Label: "I don't feel particularly guilty", Score: 0 },
+                            { Label: "I feel guilty over many things I have done or should have done", Score: 1 },
+                            { Label: "I feel quite guilty most of the time", Score: 2 },
+                            { Label: "I feel guilty all of the time", Score: 3 }
+                        ]
+                    }
+                ]
+            },
+            "COMPASS-31": {
+                ScaleName: "COMPASS-31 Autonomic Assessment",
+                Version: "1.0",
+                CalculationType: "SUM",
+                Questions: [
+                    {
+                        QuestionID: "C1",
+                        Domain: "Orthostatic Intolerance",
+                        QuestionText: "Do you experience lightheadedness, dizziness, or feeling faint when you stand up?",
+                        Options: [
+                            { Label: "Never", Score: 0 },
+                            { Label: "Rarely", Score: 1 },
+                            { Label: "Sometimes", Score: 2 },
+                            { Label: "Frequently", Score: 3 },
+                            { Label: "Almost always", Score: 4 }
+                        ]
+                    },
+                    {
+                        QuestionID: "C2",
+                        Domain: "Orthostatic Intolerance",
+                        QuestionText: "Do you have difficulty standing for more than a few minutes?",
+                        Options: [
+                            { Label: "Never", Score: 0 },
+                            { Label: "Rarely", Score: 1 },
+                            { Label: "Sometimes", Score: 2 },
+                            { Label: "Frequently", Score: 3 },
+                            { Label: "Almost always", Score: 4 }
+                        ]
+                    },
+                    {
+                        QuestionID: "C3",
+                        Domain: "Gastrointestinal",
+                        QuestionText: "Do you experience constipation?",
+                        Options: [
+                            { Label: "Never", Score: 0 },
+                            { Label: "Rarely", Score: 1 },
+                            { Label: "Sometimes", Score: 2 },
+                            { Label: "Frequently", Score: 3 },
+                            { Label: "Almost always", Score: 4 }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Global State
+        let currentScale = null;
+        let currentQuestionIndex = 0;
+        let sessionData = null;
+        let isRecording = false;
+        let recognition = null;
+        let currentResponse = '';
+        let showingBackup = false;
+        let backupQuestionText = '';
+
+        // Initialize Speech Recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                alert('Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
+                return false;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            let finalTranscript = '';
+
+            recognition.onstart = () => {
+                console.log('Speech recognition started');
+                isRecording = true;
+                finalTranscript = '';
+                updateRecordingUI();
+            };
+
+            recognition.onresult = (event) => {
+                let interim = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                        currentResponse = finalTranscript.trim();
+                        document.getElementById('responseInput').value = currentResponse;
+                        updateCapturedResponse();
+                    } else {
+                        interim += transcript;
+                    }
+                }
+                
+                document.getElementById('interimText').textContent = interim;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isRecording = false;
+                updateRecordingUI();
+                
+                if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+                    alert('Microphone permission denied. Please allow microphone access and try again.');
+                } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                    alert('Speech recognition error: ' + event.error);
+                }
+            };
+
+            recognition.onend = () => {
+                console.log('Speech recognition ended');
+                isRecording = false;
+                updateRecordingUI();
+            };
+
+            return true;
+        }
+
+        // Start Scale
+        function startScale(scaleName) {
+            currentScale = PRS_SCALES[scaleName];
+            currentQuestionIndex = 0;
+            sessionData = {
+                SessionID: `session_${Date.now()}`,
+                ScaleName: currentScale.ScaleName,
+                Version: currentScale.Version,
+                StartTime: new Date().toISOString(),
+                Items: [],
+                FinalScore: null,
+                CompletionStatus: 'IN_PROGRESS'
+            };
+
+            // Initialize speech recognition
+            if (!initSpeechRecognition()) {
+                if (!confirm('Speech recognition not available. Continue with text input only?')) {
+                    return;
+                }
+            }
+
+            document.getElementById('scaleSelection').classList.add('hidden');
+            document.getElementById('assessmentScreen').classList.remove('hidden');
+            
+            displayQuestion();
+            speakQuestion();
+        }
+
+        // Display Current Question
+        function displayQuestion() {
+            const question = currentScale.Questions[currentQuestionIndex];
+            const questionText = showingBackup ? backupQuestionText : question.QuestionText;
+            
+            document.getElementById('scaleName').textContent = currentScale.ScaleName;
+            document.getElementById('progressText').textContent = `Question ${currentQuestionIndex + 1} of ${currentScale.Questions.length}`;
+            document.getElementById('progressBadge').textContent = Math.round(((currentQuestionIndex + 1) / currentScale.Questions.length) * 100) + '%';
+            document.getElementById('progressFill').style.width = ((currentQuestionIndex + 1) / currentScale.Questions.length) * 100 + '%';
+            
+            document.getElementById('domainText').textContent = question.Domain;
+            document.getElementById('questionText').textContent = questionText;
+            
+            document.getElementById('backupAlert').classList.toggle('hidden', !showingBackup);
+            
+            // Display options
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = question.Options.map((opt, idx) => 
+                `<div class="option-item"><strong>${idx}:</strong> ${opt.Label}</div>`
+            ).join('');
+            
+            // Clear response
+            currentResponse = '';
+            document.getElementById('responseInput').value = '';
+            updateCapturedResponse();
+        }
+
+        // Speak Question
+        function speakQuestion() {
+            const question = currentScale.Questions[currentQuestionIndex];
+            const text = showingBackup ? backupQuestionText : question.QuestionText;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            
+            document.getElementById('speakBtn').textContent = 'Speaking...';
+            utterance.onend = () => {
+                document.getElementById('speakBtn').textContent = '🔊 Hear Question';
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Toggle Recording
+        function toggleRecording() {
+            if (!recognition) {
+                alert('Speech recognition not initialized. Please refresh the page.');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        // Update Recording UI
+        function updateRecordingUI() {
+            const recordBtn = document.getElementById('recordBtn');
+            const indicator = document.getElementById('recordingIndicator');
+            
+            if (isRecording) {
+                recordBtn.textContent = '🔴 RECORDING - Click to Stop';
+                recordBtn.className = 'btn btn-danger';
+                indicator.classList.remove('hidden');
+            } else {
+                recordBtn.textContent = '🎤 Start Voice Recording';
+                recordBtn.className = 'btn btn-success';
+                indicator.classList.add('hidden');
+                document.getElementById('interimText').textContent = '';
+            }
+        }
+
+        // Update Captured Response Display
+        function updateCapturedResponse() {
+            const response = document.getElementById('responseInput').value;
+            const capturedDiv = document.getElementById('capturedResponse');
+            
+            if (response && !isRecording) {
+                document.getElementById('capturedText').textContent = `"${response}"`;
+                capturedDiv.classList.remove('hidden');
+            } else {
+                capturedDiv.classList.add('hidden');
+            }
+        }
+
+        // Clear Response
+        function clearResponse() {
+            currentResponse = '';
+            document.getElementById('responseInput').value = '';
+            updateCapturedResponse();
+        }
+
+        // Listen to textarea changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('responseInput');
+            if (textarea) {
+                textarea.addEventListener('input', updateCapturedResponse);
+            }
+        });
+
+        // Submit Response
+        async function submitResponse() {
+            const response = document.getElementById('responseInput').value.trim();
+            
+            if (!response) {
+                alert('Please provide a response before submitting.');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            }
+
+            document.getElementById('submitBtn').innerHTML = '<span class="spin">⏳</span><span>Processing...</span>';
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const result = await scoreResponse(response);
+                
+                if (result.Validity === 'VALID') {
+                    // Store valid result
+                    sessionData.Items.push({
+                        QuestionID: currentScale.Questions[currentQuestionIndex].QuestionID,
+                        Domain: currentScale.Questions[currentQuestionIndex].Domain,
+                        PatientResponse: response,
+                        ChosenOption: result.ChosenOption,
+                        NumericScore: result.NumericScore,
+                        ClinicalRationale: result.ClinicalRationale,
+                        Validity: 'VALID',
+                        BackupUsed: showingBackup
+                    });
+
+                    // Move to next question or complete
+                    if (currentQuestionIndex < currentScale.Questions.length - 1) {
+                        currentQuestionIndex++;
+                        showingBackup = false;
+                        displayQuestion();
+                        speakQuestion();
+                    } else {
+                        // Calculate final score and show results
+                        completeAssessment();
+                    }
+                } else {
+                    // Show backup question
+                    showingBackup = true;
+                    backupQuestionText = result.BackupQuestion;
+                    displayQuestion();
+                    speakQuestion();
+                }
+            } catch (error) {
+                console.error('Error scoring response:', error);
+                alert('Error processing response. Please try again.');
+            }
+
+            document.getElementById('submitBtn').innerHTML = '<span>✓</span><span>Submit Response</span>';
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // Score Response with AI (OpenAI GPT-4 Mini)
+        async function scoreResponse(patientResponse) {
+            const question = currentScale.Questions[currentQuestionIndex];
+            
+            const systemPrompt = `You are a licensed clinician-level assessor specializing in neurology, psychiatry, or autonomic medicine. Your sole responsibility is to accurately interpret and score Patient Reported Scale (PRS) items for research, regulatory, and clinical audit workflows.
+
+Your mandatory process:
+- Strictly adhere to provided question, response options, and scoring
+- Respond ONLY using the prescribed JSON schema
+- Never diagnose, reassure, explain disease, or suggest treatment
+- Mark as "INVALID" only if response is completely unrelated or lacks any clinically interpretable signal
+- INVALID should be rare, reserved for true disconnect
+
+Output Format (JSON only):
+{
+  "QuestionID": "<from input>",
+  "ChosenOption": {
+    "OptionNumber": <number>,
+    "OptionText": "<exact option text>"
+  } or null,
+  "NumericScore": <number> or null,
+  "ClinicalRationale": "<concise clinician-level reasoning>",
+  "Validity": "VALID" or "INVALID",
+  "BackupQuestion": "<question text>" or null
+}`;
+
+            const inputJson = {
+                ScaleName: currentScale.ScaleName,
+                Domain: question.Domain,
+                QuestionID: question.QuestionID,
+                QuestionText: showingBackup ? backupQuestionText : question.QuestionText,
+                Options: question.Options.map((opt, idx) => ({
+                    OptionNumber: idx + 1,
+                    OptionText: opt.Label,
+                    Score: opt.Score
+                })),
+                PatientResponse: patientResponse
+            };
+
+            // Call local backend with OpenAI
+            const response = await fetch("http://localhost:5003/api/score", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    system: systemPrompt,
+                    messages: [{ role: "user", content: `INPUT\n${JSON.stringify(inputJson, null, 2)}\nOUTPUT` }]
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'API call failed');
+            }
+
+            const data = await response.json();
+            const resultText = data.content[0].text;
+            
+            const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsedResult = JSON.parse(jsonMatch[0]);
+                
+                return {
+                    Validity: parsedResult.Validity,
+                    ChosenOption: parsedResult.ChosenOption ? {
+                        Label: parsedResult.ChosenOption.OptionText,
+                        Score: parsedResult.NumericScore
+                    } : null,
+                    NumericScore: parsedResult.NumericScore,
+                    ClinicalRationale: parsedResult.ClinicalRationale,
+                    BackupQuestion: parsedResult.BackupQuestion
+                };
+            }
+            
+            throw new Error("No valid JSON in response");
+        }
+
+        // Complete Assessment
+        function completeAssessment() {
+            // Calculate final score
+            const finalScore = sessionData.Items.reduce((sum, item) => sum + item.NumericScore, 0);
+            
+            sessionData.FinalScore = finalScore;
+            sessionData.CompletionStatus = 'COMPLETED';
+            sessionData.EndTime = new Date().toISOString();
+
+            // Show results
+            document.getElementById('assessmentScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('completedScaleName').textContent = currentScale.ScaleName;
+            document.getElementById('finalScore').textContent = finalScore;
+            document.getElementById('scoreDescription').textContent = `Total from ${sessionData.Items.length} items`;
+            
+            // Display item results
+            const itemResults = document.getElementById('itemResults');
+            itemResults.innerHTML = sessionData.Items.map(item => `
+                <div class="result-item">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: #667eea;">${item.QuestionID} • ${item.Domain}</div>
+                        <div class="badge">Score: ${item.NumericScore}</div>
+                    </div>
+                    <div style="margin-bottom: 0.75rem;"><strong>Patient:</strong> "${item.PatientResponse}"</div>
+                    <div style="margin-bottom: 0.75rem;"><strong>Mapped to:</strong> ${item.ChosenOption.Label}</div>
+                    <div style="font-size: 0.875rem; color: #718096; font-style: italic; padding-top: 0.75rem; border-top: 1px solid #e2e8f0;">
+                        ${item.ClinicalRationale}
+                    </div>
+                    ${item.BackupUsed ? '<div style="margin-top: 0.75rem; font-size: 0.8125rem; color: #e53e3e; font-weight: 600;">⚠ Clarification question used</div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // Download JSON
+        function downloadJSON() {
+            const dataStr = JSON.stringify(sessionData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `PRS_${sessionData.SessionID}_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
